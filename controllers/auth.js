@@ -1,17 +1,39 @@
+const User = require('../models/user');
+
 exports.getLogin = (req, res, next) => {
-  console.log(req.get("Cookie", "loggedIn").split("=")[1]);
-  const isLoggedIn = req.get("Cookie", "loggedIn").split("=")[1];
-  res.render("auth/login", {
-    path: "/login",
-    pageTitle: "Login",
-    isAuthenticated: isLoggedIn,
+  res.render('auth/login', {
+    path: '/login',
+    pageTitle: 'Login',
+    isAuthenticated: false
+  });
+};
+
+exports.getSignup = (req, res, next) => {
+  res.render('auth/signup', {
+    path: '/signup',
+    pageTitle: 'Signup',
+    isAuthenticated: false
   });
 };
 
 exports.postLogin = (req, res, next) => {
-  // esto no funciona por que despues que haga el redirect
-  // se pierde todo y ya no queda guardado el dato de isLoggedIn
-  // req.isLoggedIn = true;
-  res.setHeader("Set-Cookie", "loggedIn=true");
-  res.redirect("/");
+  User.findById('5bab316ce0a7c75f783cb8a8')
+    .then(user => {
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      req.session.save(err => {
+        console.log(err);
+        res.redirect('/');
+      });
+    })
+    .catch(err => console.log(err));
+};
+
+exports.postSignup = (req, res, next) => {};
+
+exports.postLogout = (req, res, next) => {
+  req.session.destroy(err => {
+    console.log(err);
+    res.redirect('/');
+  });
 };
