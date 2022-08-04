@@ -3,7 +3,16 @@ const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
 
-const transporter = nodemailer.createTransport(sendgridTransport({}));
+const TEST_MAIL = "pablo@c1381926.ferozo.com";
+
+const transporter = nodemailer.createTransport({
+  host: "c1381926.ferozo.com",
+  port: 465,
+  auth: {
+    user: TEST_MAIL,
+    pass: "L3v3lup@pab",
+  },
+});
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -89,6 +98,16 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect("/login");
+          // aca mando el mail configurado arriba
+          return transporter.sendMail({
+            to: email,
+            from: TEST_MAIL,
+            subject: "Cuenta creada!!!",
+            html: "<h1>Su cuenta fue creada correctamente !!!</h1>",
+          });
+        })
+        .catch((error) => {
+          console.log(error);
         });
     })
     .catch((err) => {
