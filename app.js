@@ -1,3 +1,4 @@
+require("dotenv").config();
 const path = require("path");
 
 const express = require("express");
@@ -5,20 +6,24 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-const csrf = require('csurf');
-const flash = require('connect-flash');
+const csrf = require("csurf");
+const flash = require("connect-flash");
 
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
-const MONGODB_URI =
-  "mongodb+srv://pablo_admin:xy34TxCdRUWe3vP@miclusterpas.rqsvs.mongodb.net/shop";
+const PORT = process.env.PORT || 3000;
+
+const SECRET = process.env.SECRET || "c0d3r";
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
 const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "sessions",
 });
+
 const csrfProtection = csrf();
 
 app.set("view engine", "ejs");
@@ -32,7 +37,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
-    secret: "c0d3r",
+    secret: SECRET,
     resave: false,
     saveUninitialized: false,
     store: store,
@@ -73,8 +78,8 @@ mongoose
       result.connections[0].host,
       result.connections[0].port
     );
-    app.listen(3000, () => {
-      console.log("Server Up: 3000");
+    app.listen(PORT, () => {
+      console.log("Server Up:", PORT);
     });
   })
   .catch((err) => {
